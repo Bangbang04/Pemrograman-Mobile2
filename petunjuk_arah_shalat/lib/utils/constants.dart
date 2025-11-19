@@ -1,0 +1,1 @@
+const double qiblaDirection = 295.0; // Sudut arah kiblat (dari utara).
