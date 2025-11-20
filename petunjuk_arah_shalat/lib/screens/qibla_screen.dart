@@ -1,6 +1,6 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'dart:math';
 import 'widgets/app_drawer.dart';
 import 'widgets/app_footer.dart';
 
@@ -12,7 +12,7 @@ class QiblaScreen extends StatefulWidget {
 }
 
 class _QiblaScreenState extends State<QiblaScreen> {
-  double? _qiblaDirection; // derajat dari utara searah jarum jam
+  double? _qiblaDirection; // Arah kiblat dalam derajat dari utara
   String _status = 'Mengambil lokasi…';
 
   @override
@@ -33,24 +33,28 @@ class _QiblaScreenState extends State<QiblaScreen> {
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
         setState(() {
-          _status = 'Izin lokasi ditolak. Aktifkan izin lokasi untuk melihat arah kiblat.';
+          _status =
+              'Izin lokasi ditolak. Aktifkan izin lokasi untuk melihat arah kiblat.';
         });
         return;
       }
 
       final pos = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        locationSettings: LocationSettings(accuracy: LocationAccuracy.high),
       );
 
       final lat = pos.latitude;
       final lon = pos.longitude;
       final bearing = _calculateQibla(lat, lon);
 
+      if (!mounted) return;
+
       setState(() {
         _qiblaDirection = bearing;
         _status = 'Lokasi: ${lat.toStringAsFixed(4)}, ${lon.toStringAsFixed(4)}';
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _status = 'Gagal mendapatkan lokasi: $e';
       });
@@ -71,7 +75,7 @@ class _QiblaScreenState extends State<QiblaScreen> {
 
     var brng = atan2(y, x);
     brng = _radToDeg(brng);
-    brng = (brng + 360) % 360;
+    brng = (brng + 360) % 360; // Pastikan dalam rentang 0-360 derajat
     return brng;
   }
 
@@ -85,81 +89,74 @@ class _QiblaScreenState extends State<QiblaScreen> {
         title: const Text('Arah Kiblat'),
       ),
       drawer: const AppDrawer(),
-      body: Column(
-        children: [
-          Expanded(
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      _status,
-                      textAlign: TextAlign.center,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    _status,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+                  if (_qiblaDirection == null)
+                    const CircularProgressIndicator()
+                  else ...[
+                    SizedBox(
+                      width: 230,
+                      height: 230,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          // Lingkaran kompas
+                          Container(
+                            width: 220,
+                            height: 220,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.blue,
+                                width: 4,
+                              ),
+                            ),
+                          ),
+                          // Huruf arah mata angin
+                          const Positioned(top: 8, child: Text('N')),
+                          const Positioned(bottom: 8, child: Text('S')),
+                          const Positioned(left: 8, child: Text('W')),
+                          const Positioned(right: 8, child: Text('E')),
+                          // Panah menunjuk kiblat
+                          Transform.rotate(
+                            angle: _qiblaDirection! * pi / 180,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: const [
+                                Icon(Icons.arrow_upward,
+                                    size: 60, color: Colors.red),
+                                SizedBox(height: 8),
+                                Text('Kiblat'),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 24),
-                    if (_qiblaDirection == null)
-                      const CircularProgressIndicator()
-                    else ...[
-                      SizedBox(
-                        width: 230,
-                        height: 230,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            // Lingkaran kompas
-                            Container(
-                              width: 220,
-                              height: 220,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.blue,
-                                  width: 4,
-                                ),
-                              ),
-                            ),
-                            // Huruf N (North)
-                            const Positioned(
-                              top: 8,
-                              child: Text(
-                                'N',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            // Panah menunjuk kiblat
-                            Transform.rotate(
-                              angle: _qiblaDirection! * pi / 180,
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: const [
-                                  Icon(Icons.arrow_upward,
-                                      size: 60, color: Colors.red),
-                                  SizedBox(height: 8),
-                                  Text('Kiblat'),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Arah kiblat: ${_qiblaDirection!.toStringAsFixed(1)}° dari utara.',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ],
+                    const SizedBox(height: 16),
+                    Text(
+                      'Arah kiblat: ${_qiblaDirection!.toStringAsFixed(1)}° dari utara.',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 16),
+                    ),
                   ],
-                ),
+                ],
               ),
             ),
-          ),
-          const AppFooter(), // copyright di bawah
-        ],
+            const AppFooter(),
+          ],
+        ),
       ),
     );
   }

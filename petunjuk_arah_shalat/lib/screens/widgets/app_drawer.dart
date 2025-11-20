@@ -1,10 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../qibla_screen.dart';
 import '../info_list_screen.dart';
 import '../login_page.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
+
+  Future<void> _handleLogout(BuildContext context) async {
+    Navigator.pop(context); // Tutup drawer
+
+    // Bersihkan data login
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+
+    if (!context.mounted) return;
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => const LoginPage()),
+      (route) => false,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,19 +72,7 @@ class AppDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.logout),
             title: const Text('Logout'),
-            onTap: () async {
-              Navigator.pop(context);
-
-              // TODO: jika pakai shared_preferences, bersihkan data login di sini
-              // final prefs = await SharedPreferences.getInstance();
-              // await prefs.clear();
-
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (_) => const LoginPage()),
-                (route) => false,
-              );
-            },
+            onTap: () => _handleLogout(context),
           ),
         ],
       ),

@@ -33,6 +33,7 @@ dependencies:
   flutter_compass: ^0.7.0
   geolocator: ^14.0.2
   permission_handler: ^11.1.0
+  shared_preferences: ^2.1.0
 
 dev_dependencies:
   flutter_test:

@@ -9,7 +9,7 @@ class AppFooter extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 8, top: 16),
       child: Text(
         'Copyright by Bangbang Ramadhan - 23552011177',
-        // ganti dengan Nama dan NPM kamu sendiri
+        
         textAlign: TextAlign.center,
         style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: Colors.grey[600],
