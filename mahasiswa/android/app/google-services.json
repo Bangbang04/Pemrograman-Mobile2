@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "451802617054",
+    "project_id": "crudmahasiswa-b209e",
+    "storage_bucket": "crudmahasiswa-b209e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:451802617054:android:ba34c879bfea19d9369e4f",
+        "android_client_info": {
+          "package_name": "com.example.mahasiswa"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC9hbZNkrVy0ulEEOVpLAuRgjB4PXA0P8Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
